@@ -1,9 +1,3 @@
-#include <vector>
-#include <string>
-#include <fstream>
-#include <iostream>
-
-
 #include "Labyrinthe.h"
 #include "Chasseur.h"
 #include "Gardien.h"
@@ -22,7 +16,23 @@ Environnement* Environnement::init (char* filename)
  */
 
 Labyrinthe::Labyrinthe (char* filename)
-{
+{ 
+	std::vector<std::string> lines = getLines(filename);
+	eraseComments(&lines);
+	std::map<char, std::string> vars = getVars(&lines);
+	std::vector<std::vector<char>> labData = getLabData(&lines);
+	createWalls(&labData);
+	for(auto&& line : lines)
+	{
+		std::cout << line << "\n";
+	}
+	for(auto&& kv : vars)
+	{
+		std::cout << kv.first << "\t" << kv.second << "\n";
+	}
+	
+	
+
 	// taille du labyrinthe.
 	lab_height = 80;
 	lab_width = 25;
@@ -130,24 +140,23 @@ Labyrinthe::Labyrinthe (char* filename)
 	_data [(int)(_guards [4] -> _x / scale)][(int)(_guards [4] -> _y / scale)] = 1;
 }
 
-void getLines(char* file, std::vector<std::string> *lines)
+std::vector<std::string> Labyrinthe::getLines(char* file)
 {
-    if(lines)
-    {
-        std::ifstream laby(file);
-        if (laby.is_open())
-        {
-            std::string line;
-            while (std::getline(laby,line) )
-            {
-                lines->push_back(std::string(line));
-            }
-            laby.close();
-        }
-    }
+	std::vector<std::string> lines;
+	std::ifstream laby(file);
+	if (laby.is_open())
+	{
+		std::string line;
+		while (std::getline(laby,line) )
+		{
+			lines.push_back(std::string(line));
+		}
+		laby.close();
+	}
+	return lines;
 }
 
-void eraseComments(std::vector<std::string> *lines)
+void Labyrinthe::eraseComments(std::vector<std::string> *lines)
 {
     if(lines)
     {
@@ -162,3 +171,142 @@ void eraseComments(std::vector<std::string> *lines)
         
     }
 }
+
+std::map<char, std::string> Labyrinthe::getVars(std::vector<std::string> *lines)
+{
+	std::map<char, std::string> vars; 
+	if(lines)
+	{
+		for(auto&& line : *lines)
+		{
+			if(line.empty())
+			{
+				continue;
+			}
+			char firstChar = line.at(0); 
+			if(firstChar == '+')
+			{
+				return vars;
+			}
+			else if((firstChar >= 'a' && firstChar <= 'z') || (firstChar >= 'A' && firstChar <= 'Z'))
+			{
+				std::string val;
+				bool readStart = false;
+				for(auto&& c : line.substr(1, line.npos))
+				{
+					if(c == ' ' || c == '\t') //Si on lit un caractère blanc
+					{
+						if (readStart) //Si on a déjà commencé à lire la valeur de la variable 
+						{
+							break; //On a fini de lire la valeur
+						}
+					}
+					else
+					{
+						readStart = true;
+						val.push_back(c);
+					}
+				}
+				vars[firstChar] = std::string(val);
+				
+			}
+		}
+	}
+	return vars;	
+}
+
+
+std::vector<std::vector<char>> Labyrinthe::getLabData(std::vector<std::string> *lines)
+{
+	bool toData = false;
+	std::vector<std::vector<char>> labData;
+	if(lines)
+	{
+		for(auto&& line : *lines)
+		{
+			if(line.empty())
+			{
+				continue;
+			}
+			if(line.at(0) == '+') //On arrive au labyrinthe
+			{
+				toData = true;
+			}
+			if(toData)
+			{
+				std::vector<char> l;
+				for(auto&& c : line)
+				{
+					l.push_back(c);					
+				}
+				
+				labData.push_back(l);
+			}
+		}
+	}
+	return labData;
+}
+
+void Labyrinthe::createWalls(const std::vector<std::vector<char>> *labData)
+{
+	int nbWalls = 0;
+	std::vector<Corner> cornerList = getCornerList(labData, &nbWalls);
+	
+	
+}
+
+std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char>> *labData, int *nbWalls)
+{
+	std::vector<Corner> cornerList;
+	if(labData && nbWalls)
+	{
+		for(std::size_t i = 0; i < labData->size(); i++)
+		{
+			for(std::size_t j = 0; j < labData->at(i).size(); j++)
+			{
+				if(labData->at(i).at(j) == '+')
+				{
+					Corner w;
+					w.x = i;
+					w.y = j;
+					if(i != labData->size() - 1)
+					{
+						char c = labData->at(i + 1).at(j);
+						if(isWall(c))
+						{
+							(*nbWalls)++;
+						}
+					}
+					if(j != labData->at(i).size() - 1)
+					{
+						char c = labData->at(i).at(j + 1);
+						if(isWall(c))
+						{
+							(*nbWalls)++;
+						}
+					}
+					cornerList.push_back(w);
+				}
+			}
+			
+		}
+	}
+	return cornerList;
+}
+
+bool Labyrinthe::isWall(char c)
+{
+	switch (c)
+	{
+		case ' ':
+		case 'G':
+		case 'T':
+		case 'C':
+		case 'X':
+			return false;
+				
+		default:
+			return true;
+	}
+}
+
