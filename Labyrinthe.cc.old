@@ -1,16 +1,10 @@
-#include <vector>
-#include <string>
-#include <fstream>
-#include <iostream>
-
-
 #include "Labyrinthe.h"
 #include "Chasseur.h"
 #include "Gardien.h"
 
-Sound*	Chasseur::_hunter_fire;
-Sound*	Chasseur::_hunter_hit;
-Sound*	Chasseur::_wall_hit;
+Sound*	Chasseur::_hunter_fire;	// bruit de l'arme du chasseur.
+Sound*	Chasseur::_hunter_hit;	// cri du chasseur touché.
+Sound*	Chasseur::_wall_hit;	// on a tapé un mur.
 
 Environnement* Environnement::init (char* filename)
 {
@@ -57,13 +51,13 @@ Labyrinthe::Labyrinthe (char* filename)
 	//  (attention: pour des raisons de rapport d'aspect, les affiches doivent faire 2 de long)
 	n = 0;
 	_picts = new Wall [2];
-	// la premiï¿½re (texture par dï¿½faut).
+	// la première (texture par défaut).
 	_picts [n]._ntex = 0;
 	_picts [n]._x1 = 0; _picts [n]._y1 = 4;
 	_picts [n]._x2 = 0; _picts [n]._y2 = 6;
 	++n;
 
-	// la deuxiï¿½me a une texture diffï¿½rente.
+	// la deuxième a une texture différente.
 	char	tmp [128];
 	sprintf (tmp, "%s/%s", texture_dir, "voiture.jpg");
 
@@ -77,18 +71,18 @@ Labyrinthe::Labyrinthe (char* filename)
 	_boxes = new Box [3];
 
 	n = 0;
-	// la premiï¿½re.
+	// la première.
 	_boxes [n]._x = 12; _boxes [n]._y = 70; _boxes [n]._ntex = 0;
 	++n;
 	// la deuxieme.
 	_boxes [n]._x = 5; _boxes [n]._y = 10; _boxes [n]._ntex = 0;
 	++n;
-	// la derniï¿½re.
+	// la dernière.
 	_boxes [n]._x = 22; _boxes [n]._y = 65; _boxes [n]._ntex = 0;
 	++n;
 	_nboxes = n;
 
-	// crï¿½ation du tableau d'occupation du sol.
+	// création du tableau d'occupation du sol.
 	_data = new char* [lab_width];
 	for (int i = 0; i < lab_width; ++i)
 		_data [i] = new char [lab_height];
@@ -108,7 +102,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	_data [_boxes [1]._x][_boxes [1]._y] = 1;
 	_data [_boxes [2]._x][_boxes [2]._y] = 1;
 
-	// coordonnï¿½es du trï¿½sor.
+	// coordonnées du trésor.
 	_treasor._x = 10;
 	_treasor._y = 10;
 	// indiquer qu'on ne marche pas dessus.
@@ -128,37 +122,4 @@ Labyrinthe::Labyrinthe (char* filename)
 	_data [(int)(_guards [2] -> _x / scale)][(int)(_guards [2] -> _y / scale)] = 1;
 	_data [(int)(_guards [3] -> _x / scale)][(int)(_guards [3] -> _y / scale)] = 1;
 	_data [(int)(_guards [4] -> _x / scale)][(int)(_guards [4] -> _y / scale)] = 1;
-}
-
-void getLines(char* file, std::vector<std::string> *lines)
-{
-    if(lines)
-    {
-        std::ifstream laby(file);
-        if (laby.is_open())
-        {
-            std::string line;
-            while (std::getline(laby,line) )
-            {
-                lines->push_back(std::string(line));
-            }
-            laby.close();
-        }
-    }
-}
-
-void eraseComments(std::vector<std::string> *lines)
-{
-    if(lines)
-    {
-        for(auto&& line : *lines)
-        {
-            std::size_t commentLoc = line.find('#');
-            if(commentLoc != line.npos)
-            {
-                line.erase(commentLoc, line.npos);
-            }   
-        }
-        
-    }
 }
