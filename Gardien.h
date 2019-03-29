@@ -15,7 +15,7 @@ public:
 	Gardien (Labyrinthe* l, const char* modele) : Mover (120, 80, l, modele)
 	{
 		srand(time(0));
-		nextAngle = rand() * 360;
+		nextAngle = (rand() / (double) RAND_MAX) * 360;
 	}
 
 	// le gardien tente de se déplacer
