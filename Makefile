@@ -4,7 +4,7 @@
 FMOD		= fmod/4.3
 MFMOD		= fmod/Developer/FMOD\ Programmers\ API\ Mac/api/inc
 
-O			= Labyrinthe.o Chasseur.o
+O			= Labyrinthe.o Chasseur.o Gardien.o
 
 LIBS		= $(FMOD)/libfmodex64.so -lglut -lGLU -lGL jpeg/libjpeg.a -lm
 MLIBS		= -framework GLUT -framework OpenGL -framework Foundation jpeg/libmacjpeg.a \
@@ -28,3 +28,4 @@ clean:
 
 Labyrinthe.o:	Labyrinthe.h Chasseur.h Gardien.h
 Chasseur.o:		Chasseur.h
+Gardien.o:		Gardien.h
