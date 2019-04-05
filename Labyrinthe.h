@@ -24,7 +24,7 @@ struct Affiche {
 
 bool isAffiche(char c, std::map<char, std::string> *vars);
 bool isWall(char c);
-const char* randomGuard(std::default_random_engine generator);
+const char* randomGuard();
 
 class Labyrinthe : public Environnement {
 private:
