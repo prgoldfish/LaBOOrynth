@@ -549,9 +549,9 @@ void Labyrinthe::createMovers(const std::vector<std::vector<char>> *labData)
 		_guards[0] = new Chasseur(this);
 		_guards[0]->_x = chasseurCoords.first * scale;
 		_guards[0]->_y = chasseurCoords.second * scale;
-		srand(time(nullptr));
 		for(std::size_t i = 0; i < gardiens.size(); i++)
 		{
+			srand(time(0) + i);
 			_guards[i + 1] = new Gardien(this, randomGuard());
 			_guards[i + 1]->_x = gardiens[i].first * scale;
 			_guards[i + 1]->_y = gardiens[i].second * scale;
