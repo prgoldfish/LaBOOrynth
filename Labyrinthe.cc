@@ -36,7 +36,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	createTresor(&labData);
 	createMovers(&labData);
 	std::cout << "Avant le For" << "\n";
-	for(auto&& line : lines)
+	/*for(auto&& line : lines)
 	{
 		std::cout << line << "\n";
 	}
@@ -51,7 +51,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	for(int i = 0; i < _nguards; i++)
 	{
 		std::cout << "X : " << _guards[i]->_x << "\tY : " << _guards[i]->_y << std::endl;	
-	}
+	}*/
 	
 	
 	
@@ -432,7 +432,6 @@ void Labyrinthe::createAffiche(const std::vector<std::vector<char>> *labData, st
 				char c = labData->at(i).at(j);
 				if(isAffiche(c, vars))
 				{
-					std::cout << "Une affiche !!!" << std::endl;
 					Affiche a;
 					a.x = i;
 					a.y = j;		
@@ -449,7 +448,6 @@ void Labyrinthe::createAffiche(const std::vector<std::vector<char>> *labData, st
 		_picts = new Wall[affiches.size()];
 		for(std::size_t i = 0; i < affiches.size(); i++)
 		{
-			std::cout << "Une affiche en création !!!" << std::endl;
 			Affiche a = affiches[i];
 			_picts[i]._x1 = a.x;
 			_picts[i]._y1 = a.y;
