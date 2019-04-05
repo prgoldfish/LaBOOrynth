@@ -1,19 +1,36 @@
 #include "Chasseur.h"
 
 /*
+ * permet de tester si une case est occupÃ©e par un des gardiens
+ */
+
+bool Chasseur::occupe(int x, int y){
+	bool o = false;
+	int g = 0;
+	while(!o && g < _l -> _nguards){
+		o = ((int) _l -> _guards[g] -> _x / Environnement::scale == x && (int) _l -> _guards[g] -> _y / Environnement::scale == y);
+		g++;
+	}
+	return o;
+}
+
+/*
  *	Tente un deplacement.
  */
 
-bool Chasseur::move_aux (double dx, double dy)
-{
-	if (EMPTY == _l -> data ((int)((_x + dx) / Environnement::scale),
-							 (int)((_y + dy) / Environnement::scale)))
+bool Chasseur::move_aux (double dx, double dy){
+	int curX = (int)_x / Environnement::scale;
+	int curY = (int)_y / Environnement::scale;
+	int destX = (int)((_x + dx) / Environnement::scale);
+	int destY = (int)((_y + dy) / Environnement::scale);
+	if ((destX == curX && destY == curY) //S'il reste sur la mÃªme case, pas besoin de vÃ©rifier
+		|| (EMPTY == _l -> data (destX, destY) && !occupe(destX, destY))) //S'il change de case, on vÃ©rifie si elle est vide
 	{
 		_x += dx;
 		_y += dy;
 		return true;
 	}
-	return false;
+	else return false;
 }
 
 /*
@@ -29,7 +46,7 @@ Chasseur::Chasseur (Labyrinthe* l) : Mover (100, 80, l, 0)
 }
 
 /*
- *	Fait bouger la boule de feu (ceci est une exemple, à vous de traiter les collisions spécifiques...)
+ *	Fait bouger la boule de feu (ceci est une exemple, ï¿½ vous de traiter les collisions spï¿½cifiques...)
  */
 
 bool Chasseur::process_fireball (float dx, float dy)
@@ -52,8 +69,8 @@ bool Chasseur::process_fireball (float dx, float dy)
 	// faire exploser la boule de feu avec un bruit fonction de la distance.
 	_wall_hit -> play (1. - dist2/dmax2);
 	message ("Booom...");
-	// teste si on a touché le trésor: juste pour montrer un exemple de la
-	// fonction « partie_terminee ».
+	// teste si on a touchï¿½ le trï¿½sor: juste pour montrer un exemple de la
+	// fonction ï¿½ partie_terminee ï¿½.
 	if ((int)((_fb -> get_x () + dx) / Environnement::scale) == _l -> _treasor._x &&
 		(int)((_fb -> get_y () + dy) / Environnement::scale) == _l -> _treasor._y)
 	{
@@ -71,14 +88,14 @@ void Chasseur::fire (int angle_vertical)
 	message ("Woooshh...");
 	_hunter_fire -> play ();
 	_fb -> init (/* position initiale de la boule */ _x, _y, 10.,
-				 /* angles de visée */ angle_vertical, _angle);
+				 /* angles de visï¿½e */ angle_vertical, _angle);
 }
 
 /*
- *	Clic droit: par défaut fait tomber le premier gardien.
+ *	Clic droit: par dï¿½faut fait tomber le premier gardien.
  *
  *	Inutile dans le vrai jeu, mais c'est juste pour montrer
- *	une utilisation des fonctions « tomber » et « rester_au_sol »
+ *	une utilisation des fonctions ï¿½ tomber ï¿½ et ï¿½ rester_au_sol ï¿½
  */
 
 void Chasseur::right_click (bool shift, bool control) {

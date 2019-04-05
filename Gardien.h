@@ -10,7 +10,10 @@ class Labyrinthe;
 
 class Gardien : public Mover {
 private:
+	// prochain angle de déplacement
 	int nextAngle;
+	// permet de tester si une case est occupée par un des gardiens
+	bool occupe(int x, int y);
 public:
 	Gardien (Labyrinthe* l, const char* modele) : Mover (120, 80, l, modele)
 	{
