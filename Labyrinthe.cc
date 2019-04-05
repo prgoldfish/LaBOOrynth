@@ -6,6 +6,13 @@ Sound*	Chasseur::_hunter_fire;
 Sound*	Chasseur::_hunter_hit;
 Sound*	Chasseur::_wall_hit;
 
+const char* ennemis[] = {
+	"drfreak", 
+	"garde", 
+	"Marvin", 
+	"Potator"
+};
+
 Environnement* Environnement::init (char* filename)
 {
 	return new Labyrinthe (filename);
@@ -25,6 +32,9 @@ Labyrinthe::Labyrinthe (char* filename)
 	createWalls(&labData);
 	createWallsHitbox();
 	createAffiche(&labData, &vars);
+	createBoites(&labData);
+	createTresor(&labData);
+	createMovers(&labData);
 	std::cout << "Avant le For" << "\n";
 	for(auto&& line : lines)
 	{
@@ -38,6 +48,10 @@ Labyrinthe::Labyrinthe (char* filename)
 	{
 		std::cout << "X1 : " << _picts[i]._x1 << "\tY1 : " << _picts[i]._y1 << "\tX2 : " << _picts[i]._x2 << "\tY2 : " << _picts[i]._y2 << std::endl;	
 	}
+	for(int i = 0; i < _nguards; i++)
+	{
+		std::cout << "X : " << _guards[i]->_x << "\tY : " << _guards[i]->_y << std::endl;	
+	}
 	
 	
 	
@@ -47,7 +61,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	//lab_width = 25;
 
 	// les murs: 4 dans cet EXEMPLE!
-	int	n = 0;
+	//int	n = 0;
 
 	/*_walls = new Wall [4];
 	// le premier.
@@ -93,7 +107,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	_npicts = n;*/
 
 	// 3 caisses.
-	_boxes = new Box [3];
+	/*_boxes = new Box [3];
 
 	n = 0;
 	// la premi�re.
@@ -105,7 +119,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	// la derni�re.
 	_boxes [n]._x = 22; _boxes [n]._y = 65; _boxes [n]._ntex = 0;
 	++n;
-	_nboxes = n;
+	_nboxes = n;*/
 
 	// cr�ation du tableau d'occupation du sol.
 	/*_data = new char* [lab_width];
@@ -123,24 +137,24 @@ Labyrinthe::Labyrinthe (char* filename)
 		}*/
 
 	// indiquer qu'on ne marche pas sur une caisse.
-	_data [_boxes [0]._x][_boxes [0]._y] = 1;
+	/*_data [_boxes [0]._x][_boxes [0]._y] = 1;
 	_data [_boxes [1]._x][_boxes [1]._y] = 1;
-	_data [_boxes [2]._x][_boxes [2]._y] = 1;
+	_data [_boxes [2]._x][_boxes [2]._y] = 1;*/
 
 	// coordonn�es du tr�sor.
-	_treasor._x = 10;
+/*	_treasor._x = 10;
 	_treasor._y = 10;
 	// indiquer qu'on ne marche pas dessus.
-	_data [_treasor._x][_treasor._y] = 1;
+	_data [_treasor._x][_treasor._y] = 1;*/
 
 	// le chasseur et les 4 gardiens.
-	_nguards = 1+4;
+	/*_nguards = 1+4;
 	_guards = new Mover* [_nguards];
 	_guards [0] = new Chasseur (this);
 	_guards [1] = new Gardien (this, "drfreak");
 	_guards [2] = new Gardien (this, "Marvin"); _guards [2] -> _x = 90.; _guards [2] -> _y = 70.;
 	_guards [3] = new Gardien (this, "Potator"); _guards [3] -> _x = 60.; _guards [3] -> _y = 10.;
-	_guards [4] = new Gardien (this, "garde"); _guards [4] -> _x = 130.; _guards [4] -> _y = 100.;
+	_guards [4] = new Gardien (this, "garde"); _guards [4] -> _x = 130.; _guards [4] -> _y = 100.;*/
 
 	// indiquer qu'on ne marche pas sur les gardiens.
 	/*_data [(int)(_guards [1] -> _x / scale)][(int)(_guards [1] -> _y / scale)] = 1;
@@ -222,7 +236,7 @@ std::map<char, std::string> Labyrinthe::getVars(std::vector<std::string> *lines)
 		}
 	}
 	return vars;	
-}
+}		
 
 
 std::vector<std::vector<char>> Labyrinthe::getLabData(std::vector<std::string> *lines)
@@ -421,12 +435,12 @@ void Labyrinthe::createAffiche(const std::vector<std::vector<char>> *labData, st
 					std::cout << "Une affiche !!!" << std::endl;
 					Affiche a;
 					a.x = i;
-					a.y = j;
+					a.y = j;		
 					a.imagePath = vars->at(c);
 					if(j != labData->at(i).size() - 1)
 					{
 						char caseRight = labData->at(i).at(j + 1);
-						a.orientation = caseRight == '+' || caseRight == '|';						
+						a.orientation = !(caseRight == '+' || caseRight == '-');						
 					}
 					affiches.push_back(a);
 				}
@@ -439,8 +453,8 @@ void Labyrinthe::createAffiche(const std::vector<std::vector<char>> *labData, st
 			Affiche a = affiches[i];
 			_picts[i]._x1 = a.x;
 			_picts[i]._y1 = a.y;
-			_picts[i]._x2 = a.orientation ? a.x + 2 : a.x;
-			_picts[i]._y2 = a.orientation ? a.y : a.y + 2;
+			_picts[i]._x2 = a.orientation ? a.x - 2 : a.x;
+			_picts[i]._y2 = a.orientation ? a.y : a.y - 2;
 
 			char tmp [128];
 			sprintf(tmp, "%s/%s", texture_dir, a.imagePath.data());
@@ -461,5 +475,98 @@ bool isAffiche(char c, std::map<char, std::string> *vars)
 		return true;
 	}
 	return false;
+}
+
+void Labyrinthe::createBoites(const std::vector<std::vector<char>> *labData)
+{
+	if(labData)
+	{
+		std::vector<std::pair<int, int>> boites;
+		for(std::size_t i = 0; i < labData->size(); i++)
+		{
+			for(std::size_t j = 0; j < labData->at(i).size(); j++)
+			{
+				if(labData->at(i).at(j) == 'X')
+				{
+					boites.push_back(std::pair<int, int>(i, j));
+				}
+			}
+		}
+		_nboxes = boites.size();
+		_boxes = new Box[_nboxes];
+		for(std::size_t i = 0; i < boites.size(); i++)
+		{
+			_boxes[i]._x = boites[i].first;
+			_boxes[i]._y = boites[i].second;
+			_boxes[i]._ntex = 0;
+			_data [_boxes [i]._x][_boxes [i]._y] = 1;	
+		}
+	}
+
+}
+
+void Labyrinthe::createTresor(const std::vector<std::vector<char>> *labData)
+{
+	if(labData)
+	{
+		for(std::size_t i = 0; i < labData->size(); i++)
+		{
+			for(std::size_t j = 0; j < labData->at(i).size(); j++)
+			{
+				if(labData->at(i).at(j) == 'T')
+				{
+					_treasor._x = i;
+					_treasor._y = j;
+					_data[i][j] = 1;
+				}
+			}
+		}
+	}
+}
+
+void Labyrinthe::createMovers(const std::vector<std::vector<char>> *labData)
+{
+	if(labData)
+	{
+		std::pair<int, int> chasseurCoords(0, 0);
+		std::vector<std::pair<int, int>> gardiens;
+		for(std::size_t i = 0; i < labData->size(); i++)
+		{
+			for(std::size_t j = 0; j < labData->at(i).size(); j++)
+			{
+				if(labData->at(i).at(j) == 'G')
+				{
+					gardiens.push_back(std::pair<int, int>(i, j));
+				}
+				else if (labData->at(i).at(j) == 'C') 
+				{
+					chasseurCoords.first = i;
+					chasseurCoords.second = j;
+				}
+				
+			}
+		}
+		_nguards = gardiens.size() + 1;
+		_guards = new Mover*[_nguards];
+		_guards[0] = new Chasseur(this);
+		_guards[0]->_x = chasseurCoords.first * scale;
+		_guards[0]->_y = chasseurCoords.second * scale;
+		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+		for(std::size_t i = 0; i < gardiens.size(); i++)
+		{
+			_guards[i + 1] = new Gardien(this, randomGuard(generator));
+			_guards[i + 1]->_x = gardiens[i].first * scale;
+			_guards[i + 1]->_y = gardiens[i].second * scale;
+		}
+		
+	}
+}
+
+const char* randomGuard(std::default_random_engine generator)
+{
+	std::uniform_int_distribution<int> distribution(0,3);
+	int num = distribution(generator);
+	std::cout << num << std::endl;
+	return ennemis[num];
 }
 

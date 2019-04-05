@@ -5,6 +5,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <random>
+#include <chrono>
 #include <map>
 
 #include "Environnement.h"
@@ -22,6 +24,7 @@ struct Affiche {
 
 bool isAffiche(char c, std::map<char, std::string> *vars);
 bool isWall(char c);
+const char* randomGuard(std::default_random_engine generator);
 
 class Labyrinthe : public Environnement {
 private:
@@ -37,6 +40,9 @@ private:
 	void 							createSolVide();
 	void 							createWallsHitbox();
 	void							createAffiche(const std::vector<std::vector<char>> *labData, std::map<char, std::string> *vars);
+	void 							createBoites(const std::vector<std::vector<char>> *labData);
+	void 							createTresor(const std::vector<std::vector<char>> *labData);
+	void 							createMovers(const std::vector<std::vector<char>> *labData);
 
 public:
 	Labyrinthe (char*);
