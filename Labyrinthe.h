@@ -5,9 +5,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <random>
-#include <chrono>
 #include <map>
+#include <dirent.h>
 
 #include "Environnement.h"
 
@@ -22,9 +21,12 @@ struct Affiche {
 	bool orientation; 	//Indique le sens de l'affiche
 };
 
+std::vector<std::string> ennemis;
+
 bool isAffiche(char c, std::map<char, std::string> *vars);
 bool isWall(char c);
 const char* randomGuard();
+void initEnnemisList();
 
 class Labyrinthe : public Environnement {
 private:
