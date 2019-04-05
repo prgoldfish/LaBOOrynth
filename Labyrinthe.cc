@@ -21,7 +21,10 @@ Labyrinthe::Labyrinthe (char* filename)
 	eraseComments(&lines);
 	std::map<char, std::string> vars = getVars(&lines);
 	std::vector<std::vector<char>> labData = getLabData(&lines);
+	createSolVide(&labData);
 	createWalls(&labData);
+	createWallsHitbox();
+	std::cout << "Avant le For" << "\n";
 	for(auto&& line : lines)
 	{
 		std::cout << line << "\n";
@@ -30,17 +33,22 @@ Labyrinthe::Labyrinthe (char* filename)
 	{
 		std::cout << kv.first << "\t" << kv.second << "\n";
 	}
+	for(int i = 0; i < _nwall; i++)
+	{
+		std::cout << "X1 : " << _walls[i]._x1 << "\tY1 : " << _walls[i]._y1 << "\tX2 : " << _walls[i]._x2 << "\tY2 : " << _walls[i]._y2 << std::endl;	
+	}
+	
 	
 	
 
 	// taille du labyrinthe.
-	lab_height = 80;
-	lab_width = 25;
+	//lab_height = 80;
+	//lab_width = 25;
 
 	// les murs: 4 dans cet EXEMPLE!
 	int	n = 0;
 
-	_walls = new Wall [4];
+	/*_walls = new Wall [4];
 	// le premier.
 	_walls [n]._x1 = 0; _walls [n]._y1 = 0; 
 	_walls [n]._x2 = 0; _walls [n]._y2 = lab_height-1;
@@ -61,7 +69,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	_walls [n]._x2 = 0; _walls [n]._y2 = 0;
 	_walls [n]._ntex = 0;
 	++n;
-	_nwall = n;
+	_nwall = n;*/
 
 	// une affiche.
 	//  (attention: pour des raisons de rapport d'aspect, les affiches doivent faire 2 de long)
@@ -99,7 +107,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	_nboxes = n;
 
 	// cr�ation du tableau d'occupation du sol.
-	_data = new char* [lab_width];
+	/*_data = new char* [lab_width];
 	for (int i = 0; i < lab_width; ++i)
 		_data [i] = new char [lab_height];
 	// initialisation du tableau d'occupation du sol.
@@ -111,7 +119,7 @@ Labyrinthe::Labyrinthe (char* filename)
 			else
 				// rien dedans.
 				_data [i][j] = EMPTY;
-		}
+		}*/
 
 	// indiquer qu'on ne marche pas sur une caisse.
 	_data [_boxes [0]._x][_boxes [0]._y] = 1;
@@ -220,6 +228,7 @@ std::vector<std::vector<char>> Labyrinthe::getLabData(std::vector<std::string> *
 {
 	bool toData = false;
 	std::vector<std::vector<char>> labData;
+	std::size_t maxLineSize = 0;
 	if(lines)
 	{
 		for(auto&& line : *lines)
@@ -234,6 +243,7 @@ std::vector<std::vector<char>> Labyrinthe::getLabData(std::vector<std::string> *
 			}
 			if(toData)
 			{
+				maxLineSize = maxLineSize < line.size() ? line.size() : maxLineSize; 
 				std::vector<char> l;
 				for(auto&& c : line)
 				{
@@ -244,6 +254,8 @@ std::vector<std::vector<char>> Labyrinthe::getLabData(std::vector<std::string> *
 			}
 		}
 	}
+	lab_width = labData.size();
+	lab_height = maxLineSize;
 	return labData;
 }
 
@@ -251,8 +263,50 @@ void Labyrinthe::createWalls(const std::vector<std::vector<char>> *labData)
 {
 	int nbWalls = 0;
 	std::vector<Corner> cornerList = getCornerList(labData, &nbWalls);
-	
-	
+	_walls = new Wall[nbWalls];
+	int wallNb = 0;
+	std::cout << "Nombre de coins : " << cornerList.size() << "\tNombre de murs : " << nbWalls << std::endl;
+	for(auto&& corner : cornerList)
+	{
+		//std::cout << std::endl << std::endl << "Corner X : " << corner.x << "\tCorner Y : " << corner.y << std::endl;
+		if(corner.hasDown)
+		{
+			//std::cout << "Corner.x = " << corner.x << " LabSize X = " << labData->size() << std::endl;
+			for(std::size_t i = corner.x + 1; i < labData->size(); i++)
+			{
+				if(labData->at(i).at(corner.y) == '+')
+				{
+					_walls[wallNb]._x1 = corner.x;
+					_walls[wallNb]._x2 = i;
+					_walls[wallNb]._y1 = corner.y;
+					_walls[wallNb]._y2 = corner.y;
+					_walls[wallNb]._ntex = 0;
+					wallNb++;
+					break;
+				}
+			}
+		}	
+		if(corner.hasRight)
+		{
+			//std::cout << "Corner.y = " << corner.x << " LabSize Y = " << labData->at(corner.x).size() << std::endl;
+			for(std::size_t i = corner.y + 1; i < labData->at(corner.x).size(); i++)
+			{
+				if(labData->at(corner.x).at(i) == '+')
+				{
+					_walls[wallNb]._x1 = corner.x;
+					_walls[wallNb]._x2 = corner.x;
+					_walls[wallNb]._y1 = corner.y;
+					_walls[wallNb]._y2 = i;
+					_walls[wallNb]._ntex = 0;
+					wallNb++;
+					break;
+				}
+			}
+		}
+	}
+	_nwall = wallNb;
+	std::cout << "Nombre de murs crées : " << wallNb << std::endl;
+	std::cout << "Terminé" << std::endl;
 }
 
 std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char>> *labData, int *nbWalls)
@@ -269,11 +323,14 @@ std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char
 					Corner w;
 					w.x = i;
 					w.y = j;
+					w.hasDown = false;
+					w.hasRight = false;
 					if(i != labData->size() - 1)
 					{
 						char c = labData->at(i + 1).at(j);
 						if(isWall(c))
 						{
+							w.hasDown = true;
 							(*nbWalls)++;
 						}
 					}
@@ -282,6 +339,7 @@ std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char
 						char c = labData->at(i).at(j + 1);
 						if(isWall(c))
 						{
+							w.hasRight = true;
 							(*nbWalls)++;
 						}
 					}
@@ -310,3 +368,39 @@ bool Labyrinthe::isWall(char c)
 	}
 }
 
+void Labyrinthe::createSolVide(const std::vector<std::vector<char>> *labData)
+{
+	_data = new char* [lab_width];
+	for (int i = 0; i < lab_width; ++i)
+		_data [i] = new char [lab_height];
+	// initialisation du tableau d'occupation du sol.
+	for (int i = 0; i < lab_width; ++i)
+		for (int j = 0; j < lab_height; ++j) {
+			_data [i][j] = EMPTY;
+		}
+}
+
+void Labyrinthe::createWallsHitbox()
+{
+	for(int i = 0; i < _nwall; i++)
+	{
+		Wall w = _walls[i];
+		if (w._x1 == w._x2) 
+		{
+			for(int j = w._y1; j <= w._y2; j++)
+			{
+				_data[w._x1][j] = 1;
+			}
+			
+		}
+		else 
+		{
+			for(int j = w._x1; j <= w._x2; j++)
+			{
+				_data[j][w._y1] = 1;
+			}
+		}
+		
+	}
+	
+}

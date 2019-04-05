@@ -26,6 +26,8 @@ private:
     void                            createWalls(const std::vector<std::vector<char>> *labData);
     bool                            isWall(char c);
     std::vector<Corner>             getCornerList(const std::vector<std::vector<char>> *labData, int *nbWalls);
+	void 							createSolVide(const std::vector<std::vector<char>> *labData);
+	void 							createWallsHitbox();
 
 public:
 	Labyrinthe (char*);
