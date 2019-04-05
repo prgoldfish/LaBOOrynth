@@ -21,9 +21,10 @@ Labyrinthe::Labyrinthe (char* filename)
 	eraseComments(&lines);
 	std::map<char, std::string> vars = getVars(&lines);
 	std::vector<std::vector<char>> labData = getLabData(&lines);
-	createSolVide(&labData);
+	createSolVide();
 	createWalls(&labData);
 	createWallsHitbox();
+	createAffiche(&labData, &vars);
 	std::cout << "Avant le For" << "\n";
 	for(auto&& line : lines)
 	{
@@ -33,9 +34,9 @@ Labyrinthe::Labyrinthe (char* filename)
 	{
 		std::cout << kv.first << "\t" << kv.second << "\n";
 	}
-	for(int i = 0; i < _nwall; i++)
+	for(int i = 0; i < _npicts; i++)
 	{
-		std::cout << "X1 : " << _walls[i]._x1 << "\tY1 : " << _walls[i]._y1 << "\tX2 : " << _walls[i]._x2 << "\tY2 : " << _walls[i]._y2 << std::endl;	
+		std::cout << "X1 : " << _picts[i]._x1 << "\tY1 : " << _picts[i]._y1 << "\tX2 : " << _picts[i]._x2 << "\tY2 : " << _picts[i]._y2 << std::endl;	
 	}
 	
 	
@@ -73,7 +74,7 @@ Labyrinthe::Labyrinthe (char* filename)
 
 	// une affiche.
 	//  (attention: pour des raisons de rapport d'aspect, les affiches doivent faire 2 de long)
-	n = 0;
+	/*n = 0;
 	_picts = new Wall [2];
 	// la premi�re (texture par d�faut).
 	_picts [n]._ntex = 0;
@@ -89,7 +90,7 @@ Labyrinthe::Labyrinthe (char* filename)
 	_picts [n]._x1 = 0; _picts [n]._y1 = 8;
 	_picts [n]._x2 = 0; _picts [n]._y2 = 10;
 	++n;
-	_npicts = n;
+	_npicts = n;*/
 
 	// 3 caisses.
 	_boxes = new Box [3];
@@ -261,11 +262,10 @@ std::vector<std::vector<char>> Labyrinthe::getLabData(std::vector<std::string> *
 
 void Labyrinthe::createWalls(const std::vector<std::vector<char>> *labData)
 {
-	int nbWalls = 0;
-	std::vector<Corner> cornerList = getCornerList(labData, &nbWalls);
-	_walls = new Wall[nbWalls];
+	std::vector<Corner> cornerList = getCornerList(labData);
+	_walls = new Wall[_nwall];
 	int wallNb = 0;
-	std::cout << "Nombre de coins : " << cornerList.size() << "\tNombre de murs : " << nbWalls << std::endl;
+	std::cout << "Nombre de coins : " << cornerList.size() << "\tNombre de murs : " << _nwall << std::endl;
 	for(auto&& corner : cornerList)
 	{
 		//std::cout << std::endl << std::endl << "Corner X : " << corner.x << "\tCorner Y : " << corner.y << std::endl;
@@ -304,15 +304,15 @@ void Labyrinthe::createWalls(const std::vector<std::vector<char>> *labData)
 			}
 		}
 	}
-	_nwall = wallNb;
 	std::cout << "Nombre de murs crées : " << wallNb << std::endl;
 	std::cout << "Terminé" << std::endl;
 }
 
-std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char>> *labData, int *nbWalls)
+std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char>> *labData)
 {
 	std::vector<Corner> cornerList;
-	if(labData && nbWalls)
+	_nwall = 0;
+	if(labData)
 	{
 		for(std::size_t i = 0; i < labData->size(); i++)
 		{
@@ -331,7 +331,7 @@ std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char
 						if(isWall(c))
 						{
 							w.hasDown = true;
-							(*nbWalls)++;
+							_nwall++;
 						}
 					}
 					if(j != labData->at(i).size() - 1)
@@ -340,7 +340,7 @@ std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char
 						if(isWall(c))
 						{
 							w.hasRight = true;
-							(*nbWalls)++;
+							_nwall++;
 						}
 					}
 					cornerList.push_back(w);
@@ -352,7 +352,7 @@ std::vector<Corner> Labyrinthe::getCornerList(const std::vector<std::vector<char
 	return cornerList;
 }
 
-bool Labyrinthe::isWall(char c)
+bool isWall(char c)
 {
 	switch (c)
 	{
@@ -368,15 +368,15 @@ bool Labyrinthe::isWall(char c)
 	}
 }
 
-void Labyrinthe::createSolVide(const std::vector<std::vector<char>> *labData)
+void Labyrinthe::createSolVide()
 {
-	_data = new char* [lab_width];
+	_data = new char*[lab_width];
 	for (int i = 0; i < lab_width; ++i)
-		_data [i] = new char [lab_height];
+		_data[i] = new char[lab_height];
 	// initialisation du tableau d'occupation du sol.
 	for (int i = 0; i < lab_width; ++i)
 		for (int j = 0; j < lab_height; ++j) {
-			_data [i][j] = EMPTY;
+			_data[i][j] = EMPTY;
 		}
 }
 
@@ -404,3 +404,62 @@ void Labyrinthe::createWallsHitbox()
 	}
 	
 }
+
+void Labyrinthe::createAffiche(const std::vector<std::vector<char>> *labData, std::map<char, std::string> *vars)
+{
+	if(labData)
+	{
+		std::string tex_dir(texture_dir);
+		std::vector<Affiche> affiches;
+		for(std::size_t i = 0; i < labData->size(); i++)
+		{
+			for(std::size_t j = 0; j < labData->at(i).size(); j++)
+			{
+				char c = labData->at(i).at(j);
+				if(isAffiche(c, vars))
+				{
+					std::cout << "Une affiche !!!" << std::endl;
+					Affiche a;
+					a.x = i;
+					a.y = j;
+					a.imagePath = vars->at(c);
+					if(j != labData->at(i).size() - 1)
+					{
+						char caseRight = labData->at(i).at(j + 1);
+						a.orientation = isWall(caseRight) && (c != '|');						
+					}
+					affiches.push_back(a);
+				}
+			}
+		}
+		_picts = new Wall[affiches.size()];
+		for(std::size_t i = 0; i < affiches.size(); i++)
+		{
+			std::cout << "Une affiche en création !!!" << std::endl;
+			Affiche a = affiches[i];
+			_picts[i]._x1 = a.x;
+			_picts[i]._y1 = a.y;
+			_picts[i]._x2 = a.orientation ? a.x + 2 : a.x;
+			_picts[i]._y2 = a.orientation ? a.y : a.y + 2;
+
+			char tmp [128];
+			sprintf(tmp, "%s/%s", texture_dir, a.imagePath.data());
+			_picts[i]._ntex = wall_texture(tmp);
+			
+		}
+	
+	_npicts = affiches.size();
+		
+	}
+	
+}
+
+bool isAffiche(char c, std::map<char, std::string> *vars)
+{
+	if(vars && vars->count(c) > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
