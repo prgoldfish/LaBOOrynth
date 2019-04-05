@@ -47,11 +47,6 @@ public:
 	{
 		return _data [i][j];
 	}
-
-	void setData(int i, int j, int val)
-	{
-		_data[i][j] = val;
-	}
 };
 
 #endif

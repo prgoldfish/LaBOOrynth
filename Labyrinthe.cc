@@ -143,10 +143,10 @@ Labyrinthe::Labyrinthe (char* filename)
 	_guards [4] = new Gardien (this, "garde"); _guards [4] -> _x = 130.; _guards [4] -> _y = 100.;
 
 	// indiquer qu'on ne marche pas sur les gardiens.
-	_data [(int)(_guards [1] -> _x / scale)][(int)(_guards [1] -> _y / scale)] = 1;
+	/*_data [(int)(_guards [1] -> _x / scale)][(int)(_guards [1] -> _y / scale)] = 1;
 	_data [(int)(_guards [2] -> _x / scale)][(int)(_guards [2] -> _y / scale)] = 1;
 	_data [(int)(_guards [3] -> _x / scale)][(int)(_guards [3] -> _y / scale)] = 1;
-	_data [(int)(_guards [4] -> _x / scale)][(int)(_guards [4] -> _y / scale)] = 1;
+	_data [(int)(_guards [4] -> _x / scale)][(int)(_guards [4] -> _y / scale)] = 1;*/
 }
 
 std::vector<std::string> Labyrinthe::getLines(char* file)
@@ -426,7 +426,7 @@ void Labyrinthe::createAffiche(const std::vector<std::vector<char>> *labData, st
 					if(j != labData->at(i).size() - 1)
 					{
 						char caseRight = labData->at(i).at(j + 1);
-						a.orientation = isWall(caseRight) && (c != '|');						
+						a.orientation = caseRight == '+' || caseRight == '|';						
 					}
 					affiches.push_back(a);
 				}
