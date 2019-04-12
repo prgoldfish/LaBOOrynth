@@ -42,7 +42,7 @@ bool Gardien::voitChasseur()
 	float gardienX = (float)_x;
 	float gardienY = (float)_y;
 
-	message("X : %d, Y : %d", (int)chasseurX / Environnement::scale, (int)chasseurY / Environnement::scale);
+	//message("X : %d, Y : %d", (int)chasseurX / Environnement::scale, (int)chasseurY / Environnement::scale);
 	if(gardienX == chasseurX && gardienY == chasseurY)
 	{
 		//message("Vu");
