@@ -77,7 +77,6 @@ bool Gardien::voitChasseur()
 		return true;
 		
 	}
-	return rand()%2;
 }
 
 void Gardien::touche(){
