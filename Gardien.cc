@@ -72,8 +72,8 @@ bool Gardien::voitChasseur()
 		float sqDist = 0;
 		float curX = 0, curY = 0;
 		while(sqDist < sqDistanceChasseurGardien){// On progresse petit à petit jusqu'à rencontrer un obstacle ou dépasser le gardien
-			curX += cos(angle);
-			curY += sin(angle);
+			curX += cos(angle) * Environnement::scale;
+			curY += sin(angle) * Environnement::scale;
 			int labX = (gardienX + curX) / Environnement::scale;
 			int labY = (gardienY + curY) / Environnement::scale;
 			//printf("LabX : %d, LabY : %d\n", labX, labY);
