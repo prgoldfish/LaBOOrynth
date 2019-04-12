@@ -1,8 +1,10 @@
 #include "Gardien.h"
 #include "math.h"
+#include <cstdio>
 
 void Gardien::update (void){
 	if(hp > 0){ // ne peut agir que s'il est vivant
+		voitChasseur();
 		/*
 		// teste si touché par boule de feu
 		FireBall* fb;
@@ -51,4 +53,59 @@ bool Gardien::occupe(int x, int y){
 		g++;
 	}
 	return o;
+}
+
+bool Gardien::voitChasseur()
+{
+	float chasseurX =  (float)_l->_guards[0]->_x;
+	float chasseurY =  (float)_l->_guards[0]->_y;
+	float gardienX = (float)_x;
+	float gardienY = (float)_y;
+
+	if(gardienX == chasseurX && gardienY == chasseurY)
+	{
+		message("Vu");
+		return true;
+	}
+	else
+	{
+		float sqDistanceChasseurGardien = sqDistance(gardienX, chasseurX, gardienY, chasseurY);
+		float angle = atan2f(chasseurY - gardienY, chasseurX - gardienX);
+		float sqDist = 0;
+		float curX = 0, curY = 0;
+		while(sqDist < sqDistanceChasseurGardien){// On progresse petit à petit jusqu'à rencontrer un obstacle ou dépasser le gardien
+			curX += cos(angle);
+			curY += sin(angle);
+			int labX = (gardienX + curX) / Environnement::scale;
+			int labY = (gardienY + curY) / Environnement::scale;
+			//printf("LabX : %d, LabY : %d\n", labX, labY);
+			if(_l->data(labX, labY)) // Si on rencontre un mur, une boite...
+			{
+				message("");
+				return false;
+			}
+			else
+			{
+				sqDist = sqDistance(0, curX, 0, curY);
+				//printf("Distance CurXY : %f, Distance Chasseur Gardien : %f\n", sqrt(sqDist), sqrt(sqDistanceChasseurGardien));
+			}
+		}
+
+		// On a rencontré aucun obstacle
+		message("Vu");
+		return true;
+		
+	}
+	
+
+
+	
+	
+	return rand()%2;
+}
+
+
+float sqDistance(float x1, float x2, float y1, float y2)
+{
+	return powf(x2 - x1, 2) + powf(y2 - y1, 2);
 }

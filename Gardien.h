@@ -32,10 +32,16 @@ public:
 	void update (void);
 	// déplacement
 	bool move (double dx, double dy);
+
+	bool voitChasseur();
+
 	// ne sait pas tirer sur un ennemi.
 	void fire (int angle_vertical) {}
 	// quand a faire bouger la boule de feu...
 	bool process_fireball (float dx, float dy) { return false; }
+	
 };
+
+float sqDistance(float x1, float x2, float y1, float y2);
 
 #endif
