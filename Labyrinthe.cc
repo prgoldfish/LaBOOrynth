@@ -24,6 +24,36 @@ Labyrinthe::Labyrinthe (char* filename)
 	createBoites(&labData);
 	createTresor(&labData);
 	createMovers(&labData);
+	setTresorDistance();
+	/*std::ofstream laby("dist.txt");
+	for (int i = 0; i < lab_width; ++i)
+	{
+		for (int j = 0; j < lab_height; ++j) 
+		{
+			int val = _dist[i][j];
+			if(val == 0)
+			{
+				laby << "   " << "\t";
+			}
+			else if(val < 10)
+			{
+				laby << "00" << val << "\t";
+			}
+			else if(val < 100)
+			{
+				laby << "0" << val << "\t";
+			}
+			else
+			{
+				laby << val << "\t";
+			}
+			
+			
+			
+		}
+		laby << std::endl;
+	}
+	laby.close();*/
 }
 
 std::vector<std::string> Labyrinthe::getLines(char* file)
@@ -406,11 +436,11 @@ void Labyrinthe::createMovers(const std::vector<std::vector<char>> *labData)
 		_guards[0] = new Chasseur(this);
 		_guards[0]->_x = chasseurCoords.first * scale;
 		_guards[0]->_y = chasseurCoords.second * scale;
-		initEnnemisList();
+		std::vector<std::string> ennemis = initEnnemisList();
 		for(std::size_t i = 0; i < gardiens.size(); i++)
 		{
 			srand(time(0) + i);
-			_guards[i + 1] = new Gardien(this, randomGuard());
+			_guards[i + 1] = new Gardien(this, randomGuard(ennemis));
 			_guards[i + 1]->_x = gardiens[i].first * scale;
 			_guards[i + 1]->_y = gardiens[i].second * scale;
 		}
@@ -418,8 +448,9 @@ void Labyrinthe::createMovers(const std::vector<std::vector<char>> *labData)
 	}
 }
 
-void initEnnemisList()
+std::vector<std::string> initEnnemisList()
 {
+	std::vector<std::string> ennemis;
 	DIR *dir = opendir("./modeles");
 	struct dirent *ent;
 	if (dir) 
@@ -439,11 +470,66 @@ void initEnnemisList()
 		}
 		closedir (dir);
 	}
+	return ennemis;
 }
 
-const char* randomGuard()
+const char* randomGuard(std::vector<std::string> ennemis)
 {
 	int num = (int) (ennemis.size() * rand() / (double) RAND_MAX);
 	return ennemis[num].data();
+}
+
+void Labyrinthe::setTresorDistance()
+{
+	_dist = new int*[lab_width];
+	for (int i = 0; i < lab_width; ++i)
+		_dist[i] = new int[lab_height];
+	// initialisation du tableau de distance du trésor
+	for (int i = 0; i < lab_width; ++i)
+	{
+		for (int j = 0; j < lab_height; ++j) 
+		{
+			_dist[i][j] = 0;
+		}
+	}
+	setDistance(_treasor._x, _treasor._y, 0);
+
+	
+}
+
+void Labyrinthe::setDistance(int x, int y, int value)
+{
+	if(x >= 0 && y >= 0 && x < lab_width && y < lab_height)
+	{
+		_dist[x][y] = value;
+		if(x - 1 >= 0)
+		{
+			if((_dist[x - 1][y] > (value + 1) || (_dist[x - 1][y] == 0 && (_treasor._x != (x - 1) || _treasor._y != y))) && _data[x - 1][y] == EMPTY)
+			{
+				setDistance(x - 1, y, value + 1);
+			}
+		}
+		if(y - 1 >= 0)
+		{
+			if((_dist[x][y - 1] > (value + 1) || (_dist[x][y - 1] == 0 && (_treasor._x != (x) || _treasor._y != y - 1))) && _data[x][y - 1] == EMPTY)
+			{
+				setDistance(x, y - 1, value + 1);
+			}
+		}
+		if(x + 1 < lab_width)
+		{
+			if((_dist[x + 1][y] > (value + 1) || (_dist[x + 1][y] == 0 && (_treasor._x != (x + 1) || _treasor._y != y))) && _data[x + 1][y] == EMPTY)
+			{
+				setDistance(x + 1, y, value + 1);
+			}
+		}
+		if(y + 1 < lab_height)
+		{
+			if((_dist[x][y + 1] > (value + 1) || (_dist[x][y + 1] == 0 && (_treasor._x != (x) || _treasor._y != y + 1))) && _data[x][y + 1] == EMPTY)
+			{
+				setDistance(x, y + 1, value + 1);
+			}
+		}
+	}
 }
 

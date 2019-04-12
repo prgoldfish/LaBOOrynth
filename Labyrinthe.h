@@ -21,16 +21,17 @@ struct Affiche {
 	bool orientation; 	//Indique le sens de l'affiche
 };
 
-std::vector<std::string> ennemis;
+
 
 bool isAffiche(char c, std::map<char, std::string> *vars);
 bool isWall(char c);
-const char* randomGuard();
-void initEnnemisList();
+const char* randomGuard(std::vector<std::string> ennemis);
+std::vector<std::string> initEnnemisList();
 
 class Labyrinthe : public Environnement {
 private:
 	char	                        **_data;	// indique si la case est libre ou occup�e.
+	int		                        **_dist;	// indique si la distance entre cette case et le trésor.
 	int		                        lab_width;	// dimensions du rectangle.
 	int		                        lab_height;	// englobant le labyrinthe.
     std::vector<std::string>        getLines(char* file); 
@@ -45,6 +46,8 @@ private:
 	void 							createBoites(const std::vector<std::vector<char>> *labData);
 	void 							createTresor(const std::vector<std::vector<char>> *labData);
 	void 							createMovers(const std::vector<std::vector<char>> *labData);
+	void 							setTresorDistance();
+	void 							setDistance(int x, int y, int value);
 
 public:
 	Labyrinthe (char*);
@@ -54,6 +57,10 @@ public:
 	char data (int i, int j)
 	{
 		return _data [i][j];
+	}
+	int distance(int x, int y)
+	{
+		return _dist[x][y];
 	}
 };
 
