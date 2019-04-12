@@ -4,33 +4,31 @@
  * permet de tester si une case est occupée par un des gardiens
  */
 
-bool Chasseur::occupe(int x, int y){
-	bool o = false;
-	int g = 0;
-	while(!o && g < _l -> _nguards){
-		o = ((int) _l -> _guards[g] -> _x / Environnement::scale == x && (int) _l -> _guards[g] -> _y / Environnement::scale == y);
-		g++;
+int Chasseur::collisionGuards(double dx, double dy){
+	for(int g = 0; g < _l -> _nguards; g++){
+		if(_l -> _guards[g] != this &&
+			_l -> _guards[g] -> _x > dx - Environnement::scale && _l -> _guards[g] -> _x < dx + Environnement::scale &&
+			_l -> _guards[g] -> _y > dy - Environnement::scale && _l -> _guards[g] -> _y < dy + Environnement::scale){
+			return g;
+		}
 	}
-	return o;
+	return -1;
 }
 
 /*
  *	Tente un deplacement.
  */
 
-bool Chasseur::move_aux (double dx, double dy){
-	int curX = (int)_x / Environnement::scale;
-	int curY = (int)_y / Environnement::scale;
-	int destX = (int)((_x + dx) / Environnement::scale);
-	int destY = (int)((_y + dy) / Environnement::scale);
-	if ((destX == curX && destY == curY) //S'il reste sur la même case, pas besoin de vérifier
-		|| (EMPTY == _l -> data (destX, destY) && !occupe(destX, destY))) //S'il change de case, on vérifie si elle est vide
-	{
+bool Chasseur::move_aux (double dx, double dy)
+{
+	if (EMPTY == _l -> data ((int)((_x + dx) / Environnement::scale),
+							 (int)((_y + dy) / Environnement::scale))
+		&& collisionGuards(_x + dx, _y + dy) == -1){
 		_x += dx;
 		_y += dy;
 		return true;
 	}
-	else return false;
+	return false;
 }
 
 /*
@@ -59,16 +57,21 @@ bool Chasseur::process_fireball (float dx, float dy)
 	if (EMPTY == _l -> data ((int)((_fb -> get_x () + dx) / Environnement::scale),
 							 (int)((_fb -> get_y () + dy) / Environnement::scale)))
 	{
-		message ("Woooshh ..... %d", (int) dist2);
-		// il y a la place.
-		return true;
+		int g = collisionGuards(_fb -> get_x () + dx, _fb -> get_y () + dy);
+		if(g != -1){
+			_l -> _guards[g] -> tomber();
+		}else{
+			message ("Woooshh ..... %d", (int) dist2);
+			// il y a la place.
+			return true;
+		}
 	}
 	// collision...
 	// calculer la distance maximum en ligne droite.
 	float	dmax2 = (_l -> width ())*(_l -> width ()) + (_l -> height ())*(_l -> height ());
 	// faire exploser la boule de feu avec un bruit fonction de la distance.
 	_wall_hit -> play (1. - dist2/dmax2);
-	message ("Booom...");
+	//message ("Booom...");
 	// teste si on a touch� le tr�sor: juste pour montrer un exemple de la
 	// fonction � partie_terminee �.
 	if ((int)((_fb -> get_x () + dx) / Environnement::scale) == _l -> _treasor._x &&

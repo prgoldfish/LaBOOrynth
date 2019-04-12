@@ -11,8 +11,8 @@ class Chasseur : public Mover {
 private:
 	// accepte ou non un deplacement.
 	bool move_aux (double dx, double dy);
-	// permet de tester si une case est occupée par un des gardiens
-	bool occupe(int x, int y);
+	// permet de tester les collisions avec les gardiens
+	int collisionGuards(double x, double y);
 public:
 	/*
 	 *	Le son...
