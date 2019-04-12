@@ -60,7 +60,6 @@ bool Chasseur::process_fireball (float dx, float dy)
 	{
 		int g = collisionGuards(_fb -> get_x () + dx, _fb -> get_y () + dy);
 		if(g != -1){
-			//_l -> _guards[g] -> tomber();
 			((Gardien*) _l -> _guards[g]) -> touche();
 		}else{
 			message ("Woooshh ..... %d", (int) dist2);

@@ -1,15 +1,23 @@
 #include "Gardien.h"
+#include "Chasseur.h"
 #include "math.h"
 #include <cstdio>
 
 void Gardien::update (void){
 	if(hp > 0){ // ne peut agir que s'il est vivant
-		voitChasseur();
-		// déplacement aléatoire
-		double dx = -sin(nextAngle * M_PI /180.0) * 1;
-		double dy = cos(nextAngle * M_PI /180.0) * 1;
-		if(move(dx, dy)) _angle = nextAngle;
-		else nextAngle = (rand() / (double) RAND_MAX) * 360;
+		if(voitChasseur()){
+			// fait face au chasseur
+			nextAngle = -atan2f(_l -> _guards[0] -> _x - _x, _l -> _guards[0] -> _y - _y) * 180.0 / M_PI;
+			_angle = nextAngle;
+			// tente d'attaquer le chasseur
+			fire(0);
+		}else{
+			// déplacement aléatoire
+			double dx = -sin(nextAngle * M_PI /180.0) * 1;
+			double dy = cos(nextAngle * M_PI /180.0) * 1;
+			if(move(dx, dy)) _angle = nextAngle;
+			else nextAngle = (rand() / (double) RAND_MAX) * 360;
+		}
 	}
 };
 
@@ -79,14 +87,58 @@ bool Gardien::voitChasseur()
 	}
 }
 
-void Gardien::touche(){
-	if(hp > 0){ // ne peut pas mourir plus
-		hp--;
-		if(hp > 0) tomber();
-		else rester_au_sol();
+// tente de tirer sur un ennemi.
+void Gardien::fire (int angle_vertical) 
+{
+	if(!coolDown){
+		// empêche de tirer une dexième fois
+		coolDown = true;
+		message ("Woooshh...");
+		//_hunter_fire -> play ();
+		_fb -> init (/* position initiale de la boule */ _x, _y, 10.,
+					/* angles de vis�e */ angle_vertical, -_angle);
 	}
 }
 
+
+bool Gardien::process_fireball (float dx, float dy)
+{
+	// calculer la distance entre le chasseur et le lieu de l'explosion.
+	float	x = (_x - _fb -> get_x ()) / Environnement::scale;
+	float	y = (_y - _fb -> get_y ()) / Environnement::scale;
+	float	dist2 = x*x + y*y;
+	// on bouge que dans le vide!
+	if (EMPTY == _l -> data ((int)((_fb -> get_x () + dx) / Environnement::scale),
+							 (int)((_fb -> get_y () + dy) / Environnement::scale)))
+	{
+		int g = collisionGuards(_fb -> get_x () + dx, _fb -> get_y () + dy);
+		if(g == 0){
+			//((Gardien*) _l -> _guards[g]) -> touche();
+			partie_terminee(false);
+		}else{
+			message ("Woooshh ..... %d", (int) dist2);
+			// il y a la place.
+			return true;
+		}
+	}
+	// collision...
+	// calculer la distance maximum en ligne droite.
+	float	dmax2 = (_l -> width ())*(_l -> width ()) + (_l -> height ())*(_l -> height ());
+	// faire exploser la boule de feu avec un bruit fonction de la distance.
+	//_wall_hit -> play (1. - dist2/dmax2);
+	message ("Booom...");
+	// peut tirer de nouveau
+	coolDown = false;
+	return false;
+}
+
+void Gardien::touche(){
+	if(hp > 0){ // ne peut pas mourir plus
+		hp--;
+		if(hp > 0) tomber(); // blessé
+		else rester_au_sol(); // mort
+	}
+}
 
 float sqDistance(float x1, float x2, float y1, float y2)
 {
