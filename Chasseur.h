@@ -12,7 +12,7 @@ private:
 	// accepte ou non un deplacement.
 	bool move_aux (double dx, double dy);
 	// permet de tester si une case est occupée par un des gardiens
-	bool occupe(int x, int y);
+	int occupe(int x, int y);
 public:
 	/*
 	 *	Le son...

@@ -3,20 +3,23 @@
 
 void Gardien::update (void){
 	if(hp > 0){ // ne peut agir que s'il est vivant
+		/*
 		// teste si touché par boule de feu
 		FireBall* fb;
-		for(int g = 0; g < _l -> _nguards; g++){
+		for(int g = 0; g < 1; g++){
 			fb = _l -> _guards[g] -> _fb;
 			if((int)((fb -> get_x()) / Environnement::scale) == (int)(_x / Environnement::scale) && 
-				(int)((fb -> get_x()) / Environnement::scale) == (int)(_x / Environnement::scale)){
-					hp--;
-					if(hp > 0){
-						//tomber();
-					}else{
-						//rester_au_sol();
-					}
+				(int)((fb -> get_y()) / Environnement::scale) == (int)(_y / Environnement::scale)){
+				hp--;
+				if(hp > 0){
+					tomber();
+				}else{
+					rester_au_sol();
 				}
+		
+			}
 		}
+		*/
 		// déplacement aléatoire
 		double dx = -sin(nextAngle * M_PI /180.0) * 1;
 		double dy = cos(nextAngle * M_PI /180.0) * 1;
