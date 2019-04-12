@@ -13,13 +13,13 @@ class Labyrinthe;
 
 class Gardien : public Mover {
 private:
+	//points de santé
+	int hp;
 	// prochain angle de déplacement
 	int nextAngle;
 	// permet de tester les collisions avec les gardiens
 	int collisionGuards(double x, double y);
 public:
-	//points de santé
-	int hp;
 
 	Gardien (Labyrinthe* l, const char* modele) : Mover (120, 80, l, modele)
 	{
@@ -40,6 +40,8 @@ public:
 	// quand a faire bouger la boule de feu...
 	bool process_fireball (float dx, float dy) { return false; }
 	
+	// touché par une attaque
+	void touche();
 };
 
 float sqDistance(float x1, float x2, float y1, float y2);
