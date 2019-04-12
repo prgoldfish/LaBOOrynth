@@ -6,6 +6,9 @@
 #include <time.h>
 #include <stdlib.h>
 
+//points de santé par défaut
+#define GARDIEN_HP	5
+
 class Labyrinthe;
 
 class Gardien : public Mover {
@@ -15,8 +18,12 @@ private:
 	// permet de tester si une case est occupée par un des gardiens
 	bool occupe(int x, int y);
 public:
+	//points de santé
+	int hp;
+
 	Gardien (Labyrinthe* l, const char* modele) : Mover (120, 80, l, modele)
 	{
+		hp = GARDIEN_HP;
 		srand(time(0));
 		nextAngle = (rand() / (double) RAND_MAX) * 360;
 	}
