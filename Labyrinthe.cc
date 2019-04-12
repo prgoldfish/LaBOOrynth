@@ -6,21 +6,10 @@ Sound*	Chasseur::_hunter_fire;
 Sound*	Chasseur::_hunter_hit;
 Sound*	Chasseur::_wall_hit;
 
-/*const char* ennemis[] = {
-	"drfreak", 
-	"garde", 
-	"Marvin", 
-	"Potator"
-};*/
-
 Environnement* Environnement::init (char* filename)
 {
 	return new Labyrinthe (filename);
 }
-
-/*
- *	EXEMPLE de labyrinthe.
- */
 
 Labyrinthe::Labyrinthe (char* filename)
 { 
@@ -35,22 +24,6 @@ Labyrinthe::Labyrinthe (char* filename)
 	createBoites(&labData);
 	createTresor(&labData);
 	createMovers(&labData);
-	/*for(auto&& line : lines)
-	{
-		std::cout << line << "\n";
-	}
-	for(auto&& kv : vars)
-	{
-		std::cout << kv.first << "\t" << kv.second << "\n";
-	}
-	for(int i = 0; i < _npicts; i++)
-	{
-		std::cout << "X1 : " << _picts[i]._x1 << "\tY1 : " << _picts[i]._y1 << "\tX2 : " << _picts[i]._x2 << "\tY2 : " << _picts[i]._y2 << std::endl;	
-	}
-	for(int i = 0; i < _nguards; i++)
-	{
-		std::cout << "X : " << _guards[i]->_x << "\tY : " << _guards[i]->_y << std::endl;	
-	}*/
 }
 
 std::vector<std::string> Labyrinthe::getLines(char* file)
@@ -171,10 +144,8 @@ void Labyrinthe::createWalls(const std::vector<std::vector<char>> *labData)
 	int wallNb = 0;
 	for(auto&& corner : cornerList)
 	{
-		//std::cout << std::endl << std::endl << "Corner X : " << corner.x << "\tCorner Y : " << corner.y << std::endl;
 		if(corner.hasDown)
 		{
-			//std::cout << "Corner.x = " << corner.x << " LabSize X = " << labData->size() << std::endl;
 			for(std::size_t i = corner.x + 1; i < labData->size(); i++)
 			{
 				if(labData->at(i).at(corner.y) == '+')
@@ -191,7 +162,6 @@ void Labyrinthe::createWalls(const std::vector<std::vector<char>> *labData)
 		}	
 		if(corner.hasRight)
 		{
-			//std::cout << "Corner.y = " << corner.x << " LabSize Y = " << labData->at(corner.x).size() << std::endl;
 			for(std::size_t i = corner.y + 1; i < labData->at(corner.x).size(); i++)
 			{
 				if(labData->at(corner.x).at(i) == '+')
@@ -456,7 +426,7 @@ void initEnnemisList()
 	{
 		while ((ent = readdir (dir))) {
 			std::string filename(ent->d_name);
-			int iDot = filename.rfind('.');
+			unsigned int iDot = filename.rfind('.');
 
 			if(iDot != std::string::npos)
 			{
@@ -464,7 +434,6 @@ void initEnnemisList()
 				if(ext == "md2")
 				{
 					ennemis.push_back(filename.substr(0, iDot));
-					//printf ("%s\n", filename.substr(0, iDot).data());
 				}
 			}
 		}
@@ -475,7 +444,6 @@ void initEnnemisList()
 const char* randomGuard()
 {
 	int num = (int) (ennemis.size() * rand() / (double) RAND_MAX);
-	//std::cout << num << std::endl;
 	return ennemis[num].data();
 }
 
