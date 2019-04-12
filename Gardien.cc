@@ -4,6 +4,7 @@
 
 void Gardien::update (void){
 	if(hp > 0){ // ne peut agir que s'il est vivant
+		voitChasseur();
 		// teste si touché par boule de feu
 		FireBall* fb;
 		for(int g = 0; g < _l -> _nguards; g++){
@@ -60,7 +61,7 @@ bool Gardien::voitChasseur()
 
 	if(gardienX == chasseurX && gardienY == chasseurY)
 	{
-		printf("Vu");
+		message("Vu");
 		return true;
 	}
 	else
@@ -69,23 +70,26 @@ bool Gardien::voitChasseur()
 		float angle = atan2f(chasseurY - gardienY, chasseurX - gardienX);
 		float sqDist = 0;
 		float curX = 0, curY = 0;
-		while(sqDist <= sqDistanceChasseurGardien){// On progresse petit à petit jusqu'à rencontrer un obstacle ou dépasser le gardien
-			curX += cos(angle) * Environnement::scale;
-			curY += sin(angle) * Environnement::scale;
+		while(sqDist < sqDistanceChasseurGardien){// On progresse petit à petit jusqu'à rencontrer un obstacle ou dépasser le gardien
+			curX += cos(angle);
+			curY += sin(angle);
 			int labX = (gardienX + curX) / Environnement::scale;
 			int labY = (gardienY + curY) / Environnement::scale;
+			//printf("LabX : %d, LabY : %d\n", labX, labY);
 			if(_l->data(labX, labY)) // Si on rencontre un mur, une boite...
 			{
+				message("");
 				return false;
 			}
 			else
 			{
-				sqDist = sqDistance(gardienX, curX, gardienY, curY);
+				sqDist = sqDistance(0, curX, 0, curY);
+				//printf("Distance CurXY : %f, Distance Chasseur Gardien : %f\n", sqrt(sqDist), sqrt(sqDistanceChasseurGardien));
 			}
 		}
 
 		// On a rencontré aucun obstacle
-		printf("Vu");
+		message("Vu");
 		return true;
 		
 	}
