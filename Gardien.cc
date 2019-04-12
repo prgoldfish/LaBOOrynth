@@ -59,9 +59,10 @@ bool Gardien::voitChasseur()
 	float gardienX = (float)_x;
 	float gardienY = (float)_y;
 
+	message("X : %d, Y : %d", (int)chasseurX / Environnement::scale, (int)chasseurY / Environnement::scale);
 	if(gardienX == chasseurX && gardienY == chasseurY)
 	{
-		message("Vu");
+		//message("Vu");
 		return true;
 	}
 	else
@@ -78,7 +79,7 @@ bool Gardien::voitChasseur()
 			//printf("LabX : %d, LabY : %d\n", labX, labY);
 			if(_l->data(labX, labY)) // Si on rencontre un mur, une boite...
 			{
-				message("");
+				//message("");
 				return false;
 			}
 			else
@@ -89,7 +90,7 @@ bool Gardien::voitChasseur()
 		}
 
 		// On a rencontré aucun obstacle
-		message("Vu");
+		//message("Vu");
 		return true;
 		
 	}
