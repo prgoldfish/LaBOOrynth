@@ -1,5 +1,6 @@
 #include "Gardien.h"
 #include "Chasseur.h"
+#include "Labyrinthe.h"
 #include "math.h"
 #include <cstdio>
 
@@ -11,12 +12,37 @@ void Gardien::update (void){
 			_angle = nextAngle;
 			// tente d'attaquer le chasseur
 			fire(0);
+			// passe en mode attaque
+			defense = false;
 		}else{
-			// déplacement aléatoire
-			double dx = -sin(nextAngle * M_PI /180.0) * 1;
-			double dy = cos(nextAngle * M_PI /180.0) * 1;
-			if(move(dx, dy)) _angle = nextAngle;
-			else nextAngle = (rand() / (double) RAND_MAX) * 360;
+			if(defense){
+				//suivre le chemin vers le trésor
+				int intX = _x / Environnement::scale;
+				int intY = _y / Environnement::scale;
+				double dx = 0;
+				double dy = 0;
+				if(EMPTY == _l -> data (intX + 1, intY) && ((Labyrinthe*)_l)->distance(intX + 1, intY) < ((Labyrinthe*)_l)->distance(intX, intY)){
+					dx = 1;
+				}
+				if(EMPTY == _l -> data (intX - 1, intY) && ((Labyrinthe*)_l)->distance(intX - 1, intY) < ((Labyrinthe*)_l)->distance(intX, intY)){
+					dx = -1;
+				}
+				if(EMPTY == _l -> data (intX, intY + 1) && ((Labyrinthe*)_l)->distance(intX, intY + 1) < ((Labyrinthe*)_l)->distance(intX, intY)){
+					dy = 1;
+				}
+				if(EMPTY == _l -> data (intX, intY - 1) && ((Labyrinthe*)_l)->distance(intX, intY - 1) < ((Labyrinthe*)_l)->distance(intX, intY)){
+					dy = -1;
+				}
+				move(dx, dy) || move(dx, 0.0) || move(0.0, dy);
+				nextAngle = -atan2f(dx, dy) * 180.0 / M_PI;
+				_angle = nextAngle;
+			}else{
+				// déplacement aléatoire
+				double dx = -sin(nextAngle * M_PI /180.0) * 1;
+				double dy = cos(nextAngle * M_PI /180.0) * 1;
+				if(move(dx, dy)) _angle = nextAngle;
+				else nextAngle = (rand() / (double) RAND_MAX) * 360;
+			}
 		}
 	}
 };

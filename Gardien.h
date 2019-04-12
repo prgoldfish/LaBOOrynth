@@ -15,6 +15,8 @@ class Gardien : public Mover {
 private:
 	//points de santé
 	int hp;
+	// détermine si le gardien est en mode défense
+	bool defense;
 	// prochain angle de déplacement
 	int nextAngle;
 	// empêche le gardien de tirer
@@ -26,6 +28,7 @@ public:
 	Gardien (Labyrinthe* l, const char* modele) : Mover (120, 80, l, modele)
 	{
 		hp = GARDIEN_HP;
+		defense = true;
 		srand(time(0));
 		nextAngle = (rand() / (double) RAND_MAX) * 360;
 		coolDown = false;

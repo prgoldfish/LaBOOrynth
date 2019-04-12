@@ -1,6 +1,5 @@
 #include "Chasseur.h"
 #include "Gardien.h"
-#include "Labyrinthe.h"
 
 /*
  * permet de tester si une case est occupée par un des gardiens
@@ -23,7 +22,7 @@ int Chasseur::collisionGuards(double dx, double dy){
 
 bool Chasseur::move_aux (double dx, double dy)
 {
-	message("Distance du tresor : %d", ((Labyrinthe*)_l)->distance(_x / Environnement::scale, _y / Environnement::scale));
+	//message("Distance du tresor : %d", ((Labyrinthe*)_l)->distance(_x / Environnement::scale, _y / Environnement::scale));
 
 	if (EMPTY == _l -> data ((int)((_x + dx) / Environnement::scale),
 							 (int)((_y + dy) / Environnement::scale))
