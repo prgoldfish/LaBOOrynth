@@ -11,7 +11,9 @@ int Chasseur::collisionGuards(double dx, double dy){
 		if(_l -> _guards[g] != this &&
 			_l -> _guards[g] -> _x > dx - Environnement::scale && _l -> _guards[g] -> _x < dx + Environnement::scale &&
 			_l -> _guards[g] -> _y > dy - Environnement::scale && _l -> _guards[g] -> _y < dy + Environnement::scale){
-			return g;
+			if(((Gardien*)_l -> _guards[g]) -> hp > 0){
+				return g;
+			}
 		}
 	}
 	return -1;

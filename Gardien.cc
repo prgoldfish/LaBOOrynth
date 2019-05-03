@@ -14,11 +14,17 @@ void Gardien::update (void){
 			fire(0);
 			// passe en mode attaque
 			defense = false;
+			// se souvient du chasseur
+			vu = true;
 		}else{
-			int intX = _x / Environnement::scale;
-			int intY = _y / Environnement::scale;
+			if(!vu){
+				defense = (defTotale() < ((Labyrinthe*)_l)->dist_max() / (_l -> _nguards / 2.));
+				message("dt : %f seuil : %f", defTotale(), ((Labyrinthe*)_l)->dist_max() / (_l -> _nguards / 2.));
+			}
 			if(defense){
-				//suivre le chemin vers le trésor
+				// suivre le chemin vers le trésor
+				int intX = _x / Environnement::scale;
+				int intY = _y / Environnement::scale;
 				double dx = 0;
 				double dy = 0;
 				if(EMPTY == _l -> data (intX + 1, intY) && ((Labyrinthe*)_l)->distance(intX + 1, intY) < ((Labyrinthe*)_l)->distance(intX, intY)){
@@ -37,11 +43,14 @@ void Gardien::update (void){
 				nextAngle = -atan2f(dx, dy) * 180.0 / M_PI;
 				_angle = nextAngle;
 			}else{
-				// déplacement aléatoire
+				// avance en ligne droite jusqu'au mur
 				double dx = -sin(nextAngle * M_PI /180.0) * 1;
 				double dy = cos(nextAngle * M_PI /180.0) * 1;
 				if(move(dx, dy)) _angle = nextAngle;
-				else nextAngle = (rand() / (double) RAND_MAX) * 360;
+				else{ // mur atteint
+					nextAngle = (rand() / (double) RAND_MAX) * 360;
+					vu = false; // chasseur perdu de vue
+				}
 			}
 		}
 	}
@@ -63,7 +72,9 @@ int Gardien::collisionGuards(double dx, double dy){
 		if(_l -> _guards[g] != this &&
 			_l -> _guards[g] -> _x > dx - Environnement::scale && _l -> _guards[g] -> _x < dx + Environnement::scale &&
 			_l -> _guards[g] -> _y > dy - Environnement::scale && _l -> _guards[g] -> _y < dy + Environnement::scale){
-			return g;
+			if(g == 0 || ((Gardien*)_l -> _guards[g]) -> hp > 0){
+				return g;
+			}
 		}
 	}
 	return -1;
@@ -111,6 +122,23 @@ bool Gardien::voitChasseur()
 		return true;
 		
 	}
+}
+
+
+// potentiel de defense du gardien
+double Gardien::pdef(){
+	if(hp > 0)
+		return ((Labyrinthe*)_l)->dist_max() / ((Labyrinthe*)_l)->distance(_x / Environnement::scale, _y / Environnement::scale);
+	else return 0;
+}
+
+// potentiel de defense de tous les gardiens
+double Gardien::defTotale(){
+	double dt = 0;
+	for(int g = 1; g < _l -> _nguards; g++){
+		dt += ((Gardien*)_l -> _guards[g]) -> pdef();
+	}
+	return dt;
 }
 
 // tente de tirer sur un ennemi.
