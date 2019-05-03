@@ -15,10 +15,10 @@ void Gardien::update (void){
 			// passe en mode attaque
 			defense = false;
 		}else{
+			int intX = _x / Environnement::scale;
+			int intY = _y / Environnement::scale;
 			if(defense){
 				//suivre le chemin vers le trésor
-				int intX = _x / Environnement::scale;
-				int intY = _y / Environnement::scale;
 				double dx = 0;
 				double dy = 0;
 				if(EMPTY == _l -> data (intX + 1, intY) && ((Labyrinthe*)_l)->distance(intX + 1, intY) < ((Labyrinthe*)_l)->distance(intX, intY)){
@@ -116,10 +116,11 @@ bool Gardien::voitChasseur()
 // tente de tirer sur un ennemi.
 void Gardien::fire (int angle_vertical) 
 {
-	if(!coolDown){
+	if(coolDown > 0) coolDown --;
+	if(coolDown == 0){
 		// empêche de tirer une dexième fois
-		coolDown = true;
-		message ("Woooshh...");
+		coolDown = -1;
+		//message ("Woooshh...");
 		//_hunter_fire -> play ();
 		_fb -> init (/* position initiale de la boule */ _x, _y, 10.,
 					/* angles de vis�e */ angle_vertical, -_angle);
@@ -130,31 +131,30 @@ void Gardien::fire (int angle_vertical)
 bool Gardien::process_fireball (float dx, float dy)
 {
 	// calculer la distance entre le chasseur et le lieu de l'explosion.
-	float	x = (_x - _fb -> get_x ()) / Environnement::scale;
-	float	y = (_y - _fb -> get_y ()) / Environnement::scale;
-	float	dist2 = x*x + y*y;
+	//float	x = (_x - _fb -> get_x ()) / Environnement::scale;
+	//float	y = (_y - _fb -> get_y ()) / Environnement::scale;
+	//float	dist2 = x*x + y*y;
 	// on bouge que dans le vide!
 	if (EMPTY == _l -> data ((int)((_fb -> get_x () + dx) / Environnement::scale),
 							 (int)((_fb -> get_y () + dy) / Environnement::scale)))
 	{
 		int g = collisionGuards(_fb -> get_x () + dx, _fb -> get_y () + dy);
 		if(g == 0){
-			//((Gardien*) _l -> _guards[g]) -> touche();
-			partie_terminee(false);
+			((Chasseur*) _l -> _guards[g]) -> touche();
 		}else{
-			message ("Woooshh ..... %d", (int) dist2);
+			//message ("Woooshh ..... %d", (int) dist2);
 			// il y a la place.
 			return true;
 		}
 	}
 	// collision...
 	// calculer la distance maximum en ligne droite.
-	float	dmax2 = (_l -> width ())*(_l -> width ()) + (_l -> height ())*(_l -> height ());
+	//float	dmax2 = (_l -> width ())*(_l -> width ()) + (_l -> height ())*(_l -> height ());
 	// faire exploser la boule de feu avec un bruit fonction de la distance.
 	//_wall_hit -> play (1. - dist2/dmax2);
-	message ("Booom...");
+	//message ("Booom...");
 	// peut tirer de nouveau
-	coolDown = false;
+	coolDown = GARDIEN_COOLDOWN;
 	return false;
 }
 

@@ -8,6 +8,7 @@
 
 //points de santé par défaut
 #define GARDIEN_HP	5
+#define GARDIEN_COOLDOWN	100
 
 class Labyrinthe;
 
@@ -20,7 +21,7 @@ private:
 	// prochain angle de déplacement
 	int nextAngle;
 	// empêche le gardien de tirer
-	bool coolDown;
+	int coolDown;
 	// permet de tester les collisions avec les gardiens
 	int collisionGuards(double x, double y);
 public:
@@ -31,7 +32,7 @@ public:
 		defense = true;
 		srand(time(0));
 		nextAngle = (rand() / (double) RAND_MAX) * 360;
-		coolDown = false;
+		coolDown = GARDIEN_COOLDOWN;
 	}
 
 	// le gardien tente de se déplacer

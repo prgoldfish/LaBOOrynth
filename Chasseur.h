@@ -5,10 +5,14 @@
 #include "Mover.h"
 #include "Sound.h"
 
+#define CHASSEUR_HP	5
+
 class Labyrinthe;
 
 class Chasseur : public Mover {
 private:
+	//points de santé
+	int hp;
 	// accepte ou non un deplacement.
 	bool move_aux (double dx, double dy);
 	// permet de tester les collisions avec les gardiens
@@ -34,6 +38,9 @@ public:
 	void fire (int angle_vertical);
 	// clic droit.
 	void right_click (bool shift, bool control);
+	
+	// touché par une attaque
+	void touche();
 };
 
 #endif

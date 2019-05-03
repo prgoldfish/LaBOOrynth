@@ -484,6 +484,7 @@ void Labyrinthe::setTresorDistance()
 	_dist = new int*[lab_width];
 	for (int i = 0; i < lab_width; ++i)
 		_dist[i] = new int[lab_height];
+	
 	// initialisation du tableau de distance du trésor
 	for (int i = 0; i < lab_width; ++i)
 	{
@@ -492,9 +493,19 @@ void Labyrinthe::setTresorDistance()
 			_dist[i][j] = 0;
 		}
 	}
+
+	//calcul des distances à partir du trésor
 	setDistance(_treasor._x, _treasor._y, 0);
 
-	
+	//calcul de la distance maximale
+	_dist_max = 0;
+	for (int i = 0; i < lab_width; ++i)
+	{
+		for (int j = 0; j < lab_height; ++j) 
+		{
+			if(_dist[i][j] > _dist_max) _dist_max = _dist[i][j];
+		}
+	}
 }
 
 void Labyrinthe::setDistance(int x, int y, int value)

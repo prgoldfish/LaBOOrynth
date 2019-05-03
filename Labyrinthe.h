@@ -32,6 +32,7 @@ class Labyrinthe : public Environnement {
 private:
 	char	                        **_data;	// indique si la case est libre ou occup�e.
 	int		                        **_dist;	// indique si la distance entre cette case et le trésor.
+	int								_dist_max;	// indique la plus grande distance
 	int		                        lab_width;	// dimensions du rectangle.
 	int		                        lab_height;	// englobant le labyrinthe.
     std::vector<std::string>        getLines(char* file); 
@@ -53,6 +54,7 @@ public:
 	Labyrinthe (char*);
 	int width () { return lab_width;}	// retourne la largeur du labyrinthe.
 	int height () { return lab_height;}	// retourne la longueur du labyrinthe.
+	int dist_max () { return _dist_max;}	// retourne la longueur du labyrinthe.
 	// retourne l'�tat (occupation) de la case (i, j).
 	char data (int i, int j)
 	{

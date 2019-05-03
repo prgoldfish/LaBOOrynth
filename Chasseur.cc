@@ -1,5 +1,6 @@
 #include "Chasseur.h"
 #include "Gardien.h"
+#include "Labyrinthe.h"
 
 /*
  * permet de tester si une case est occupée par un des gardiens
@@ -22,14 +23,18 @@ int Chasseur::collisionGuards(double dx, double dy){
 
 bool Chasseur::move_aux (double dx, double dy)
 {
-	//message("Distance du tresor : %d", ((Labyrinthe*)_l)->distance(_x / Environnement::scale, _y / Environnement::scale));
+	//message("Distance du tresor : %d Distance max : %d", ((Labyrinthe*)_l)->distance(_x / Environnement::scale, _y / Environnement::scale), ((Labyrinthe*)_l)->dist_max());
+	
+	if(hp > 0){ // ne peut agir que s'il est vivant
+		// tester si la place est libre
+		if (EMPTY == _l -> data ((int)((_x + dx) / Environnement::scale),
+								(int)((_y + dy) / Environnement::scale))
+			&& collisionGuards(_x + dx, _y + dy) == -1){
+			_x += dx;
+			_y += dy;
+			return true;
+		}
 
-	if (EMPTY == _l -> data ((int)((_x + dx) / Environnement::scale),
-							 (int)((_y + dy) / Environnement::scale))
-		&& collisionGuards(_x + dx, _y + dy) == -1){
-		_x += dx;
-		_y += dy;
-		return true;
 	}
 	return false;
 }
@@ -40,6 +45,8 @@ bool Chasseur::move_aux (double dx, double dy)
 
 Chasseur::Chasseur (Labyrinthe* l) : Mover (100, 80, l, 0)
 {
+	hp = CHASSEUR_HP;
+
 	_hunter_fire = new Sound ("sons/hunter_fire.wav");
 	_hunter_hit = new Sound ("sons/hunter_hit.wav");
 	if (_wall_hit == 0)
@@ -61,10 +68,10 @@ bool Chasseur::process_fireball (float dx, float dy)
 							 (int)((_fb -> get_y () + dy) / Environnement::scale)))
 	{
 		int g = collisionGuards(_fb -> get_x () + dx, _fb -> get_y () + dy);
-		if(g != -1){
+		if(g > 0){
 			((Gardien*) _l -> _guards[g]) -> touche();
 		}else{
-			message ("Woooshh ..... %d", (int) dist2);
+			//message ("Woooshh ..... %d", (int) dist2);
 			// il y a la place.
 			return true;
 		}
@@ -91,7 +98,7 @@ bool Chasseur::process_fireball (float dx, float dy)
 
 void Chasseur::fire (int angle_vertical)
 {
-	message ("Woooshh...");
+	//message ("Woooshh...");
 	_hunter_fire -> play ();
 	_fb -> init (/* position initiale de la boule */ _x, _y, 10.,
 				 /* angles de vis�e */ angle_vertical, _angle);
@@ -109,4 +116,13 @@ void Chasseur::right_click (bool shift, bool control) {
 		_l -> _guards [1] -> rester_au_sol ();
 	else
 		_l -> _guards [1] -> tomber ();
+}
+
+void Chasseur::touche(){
+	if(hp > 0){ // ne peut pas mourir plus
+		hp--;
+		_hunter_hit -> play(1, 0.5); // son de douleur
+		message("TOUCHE! %d hp restants", hp);
+		if(hp == 0) partie_terminee(false); // mort
+	}
 }
