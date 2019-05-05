@@ -6,6 +6,8 @@
 
 void Gardien::update (void){
 	if(hp > 0){ // ne peut agir que s'il est vivant
+		//diminue le cooldown
+		if(coolDown > 0) coolDown --;
 		if(voitChasseur()){
 			// fait face au chasseur
 			nextAngle = -atan2f(_l -> _guards[0] -> _x - _x, _l -> _guards[0] -> _y - _y) * 180.0 / M_PI;
@@ -144,7 +146,6 @@ double Gardien::defTotale(){
 // tente de tirer sur un ennemi.
 void Gardien::fire (int angle_vertical) 
 {
-	if(coolDown > 0) coolDown --;
 	if(coolDown == 0){
 		// empêche de tirer une dexième fois
 		coolDown = -1;
