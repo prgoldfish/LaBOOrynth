@@ -32,7 +32,7 @@ public:
 	}
 	// le chasseur ne pense pas!
 	void update (void) {};
-	// fait bouger la boule de feu (ceci est une exemple, � vous de traiter les collisions sp�cifiques...)
+	// fait bouger la boule de feu
 	bool process_fireball (float dx, float dy);
 	// tire sur un ennemi (clic gauche).
 	void fire (int angle_vertical);

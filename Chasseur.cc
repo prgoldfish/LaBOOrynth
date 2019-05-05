@@ -26,7 +26,13 @@ int Chasseur::collisionGuards(double dx, double dy){
 bool Chasseur::move_aux (double dx, double dy)
 {
 	//message("Distance du tresor : %d Distance max : %d", ((Labyrinthe*)_l)->distance(_x / Environnement::scale, _y / Environnement::scale), ((Labyrinthe*)_l)->dist_max());
-	
+	//si on touche le trésor, la partie est gagnée
+	if ((int)((_x + dx) / Environnement::scale) == _l -> _treasor._x &&
+		(int)((_y + dy) / Environnement::scale) == _l -> _treasor._y)
+	{
+		partie_terminee (true);
+	}
+
 	if(hp > 0){ // ne peut agir que s'il est vivant
 		// tester si la place est libre
 		if (EMPTY == _l -> data ((int)((_x + dx) / Environnement::scale),
@@ -56,7 +62,7 @@ Chasseur::Chasseur (Labyrinthe* l) : Mover (100, 80, l, 0)
 }
 
 /*
- *	Fait bouger la boule de feu (ceci est une exemple, � vous de traiter les collisions sp�cifiques...)
+ *	Fait bouger la boule de feu
  */
 
 bool Chasseur::process_fireball (float dx, float dy)
@@ -86,11 +92,13 @@ bool Chasseur::process_fireball (float dx, float dy)
 	//message ("Booom...");
 	// teste si on a touch� le tr�sor: juste pour montrer un exemple de la
 	// fonction � partie_terminee �.
+	/*
 	if ((int)((_fb -> get_x () + dx) / Environnement::scale) == _l -> _treasor._x &&
 		(int)((_fb -> get_y () + dy) / Environnement::scale) == _l -> _treasor._y)
 	{
 		partie_terminee (true);
 	}
+	*/
 	return false;
 }
 
@@ -114,10 +122,12 @@ void Chasseur::fire (int angle_vertical)
  */
 
 void Chasseur::right_click (bool shift, bool control) {
+	/*
 	if (shift)
 		_l -> _guards [1] -> rester_au_sol ();
 	else
 		_l -> _guards [1] -> tomber ();
+	*/
 }
 
 void Chasseur::touche(){
