@@ -25,6 +25,7 @@ int Chasseur::collisionGuards(double dx, double dy){
 
 bool Chasseur::move_aux (double dx, double dy)
 {
+	message("Health : %d", hp);
 	//message("Distance du tresor : %d Distance max : %d", ((Labyrinthe*)_l)->distance(_x / Environnement::scale, _y / Environnement::scale), ((Labyrinthe*)_l)->dist_max());
 	//si on touche le trésor, la partie est gagnée
 	if ((int)((_x + dx) / Environnement::scale) == _l -> _treasor._x &&
@@ -134,7 +135,7 @@ void Chasseur::touche(){
 	if(hp > 0){ // ne peut pas mourir plus
 		hp--;
 		_hunter_hit -> play(1, 0.5); // son de douleur
-		message("TOUCHE! %d hp restants", hp);
+	message("Health : %d", hp);
 		if(hp == 0) partie_terminee(false); // mort
 	}
 }

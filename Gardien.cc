@@ -21,7 +21,7 @@ void Gardien::update (void){
 		}else{
 			if(!vu){
 				defense = (defTotale() < ((Labyrinthe*)_l)->dist_max() / (_l -> _nguards / 2.));
-				message("dt : %f seuil : %f", defTotale(), ((Labyrinthe*)_l)->dist_max() / (_l -> _nguards / 2.));
+				//message("dt : %f seuil : %f", defTotale(), ((Labyrinthe*)_l)->dist_max() / (_l -> _nguards / 2.));
 			}
 			if(defense){
 				// suivre le chemin vers le trésor
